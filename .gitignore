@@ -1,0 +1,79 @@
+# Node / JavaScript
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+package-lock.json
+.pnpm-debug.log
+
+# Build output
+dist/
+build/
+lib/
+out/
+coverage/
+.nyc_output/
+**/*.tsbuildinfo
+
+# Environment / local config
+.env
+.env.*
+.env.local
+.env.dev
+.env.prod
+.local.env
+secret-*.env
+
+# Log files
+logs/
+*.log
+npm-debug.log*
+*.tmp
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Docker volumes / local runtimes
+agent_logs/
+postgres_data/
+pgdata/
+
+# VS Code - keep settings.json committed but ignore generated Copilot context
+.vscode/copilot-context.md
+.vscode/copilot-queries.log
+dist_test/.vscode/copilot-context.md
+
+# IDEs
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.iml
+
+# TypeScript
+*.tsbuildinfo
+
+# Other
+*.tgz
+.cache
+.envrc
+
+# Optional: secret keys
+*.key
+*.pem
+secrets/
+
+# Ignore local test artifacts
+test-output/
+
+# Ignore compiled Python artifacts (if any)
+__pycache__/
+*.py[cod]
+
+# Ignore generated docs or bundles
+docs/_site/
+
+# End of .gitignore
