@@ -20,8 +20,8 @@ Veraltete Dateien und Test-Dokumentation, die nicht mehr aktiv verwendet werden.
 ## 📚 Aktive Dokumentation (im Root):
 
 - `README.md` — Projekt-Übersicht
-- `pdr.md` — Design Review
-- `architecture.md` — Architektur
+- `docs/prd.md` — Design Review
+- `docs/architecture.md` — Architektur
 - `docs/NAS_DEPLOYMENT.md` — Deployment-Guide
 - `docs/COPILOT_INTEGRATION.md` — MCP Integration (V1 Roadmap)
 

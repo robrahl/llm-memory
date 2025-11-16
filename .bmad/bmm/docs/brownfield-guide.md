@@ -673,7 +673,7 @@ correct-course               # If issues
 **Phase 2 Planning:**
 
 - `docs/tech-spec.md` (Quick Flow track)
-- `docs/PRD.md` (BMad Method/Enterprise tracks - FRs/NFRs only)
+- `docs/prd.md` (BMad Method/Enterprise tracks - FRs/NFRs only)
 
 **Phase 3 Solutioning:**
 
