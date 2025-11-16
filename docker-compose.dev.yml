@@ -1,0 +1,62 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: llm-memory-postgres
+    environment:
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-changeme}
+      POSTGRES_DB: ai_memory
+      POSTGRES_USER: ${DB_USER:-postgres}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./scripts/init-pgvector.sql:/docker-entrypoint-initdb.d/1-init.sql
+    networks:
+      - llm-memory-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-postgres}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  agent:
+    build:
+      context: .
+      dockerfile: Dockerfile.agent
+    container_name: llm-memory-agent
+    environment:
+      DATABASE_URL: "postgresql://${DB_USER:-postgres}:${DB_PASSWORD:-changeme}@postgres:5432/ai_memory"
+      LLM_BASE_URL: "${LLM_BASE_URL:-http://host.docker.internal:11434}"
+      LLM_PROVIDER: "${LLM_PROVIDER:-openai}"
+      NODE_ENV: "${NODE_ENV:-development}"
+      LOG_LEVEL: "${LOG_LEVEL:-info}"
+    ports:
+      - "3000:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./src:/app/src
+      - agent_logs:/app/logs
+    networks:
+      - llm-memory-net
+    healthcheck:
+      test: ["CMD", "node", "/app/healthcheck.js"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    command: ["npm", "run", "dev"]
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+    driver: local
+  agent_logs:
+    driver: local
+
+networks:
+  llm-memory-net:
+    driver: bridge

@@ -1,0 +1,23 @@
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Copy package files
+COPY package.json ./
+
+# Install dependencies (includes dev deps for dev run)
+RUN npm install --no-audit --no-fund
+
+# Copy source and config
+COPY src ./src
+COPY tsconfig.json ./
+COPY healthcheck.js ./
+
+# Build TypeScript (for production usage; dev uses tsx runner)
+RUN npm run build || true
+
+# Expose port
+EXPOSE 3000
+
+# Default command is overridden in docker-compose for dev
+CMD ["npm", "run", "start"]

@@ -1,0 +1,15 @@
+{
+  "copilot.advanced": {
+    "debug.testOverrideFlag": false,
+    "debug.testOverrideFlagWithoutMasthead": false,
+    "debug.overrideChatEnabled": false
+  },
+  "[markdown]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "files.exclude": {
+    "**/.git": true,
+    "**/node_modules": true,
+    "**/.DS_Store": true
+  }
+}
