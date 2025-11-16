@@ -10,10 +10,12 @@
 - `scripts/` — Dev-Scripts
 - `src/` — Source Code
 
-### Aktive Dateien im Root
+-### Aktive Dateien im Root
 - `README.md` — Projekt-Übersicht
 - `pdr.md` — Project Design Review
-- `architecture.md` — Architektur-Dokumentation
+### Aktive Dokumente (docs/)
+- `docs/prd.md` — Project Design Review
+- `docs/architecture.md` — Architektur-Dokumentation
 - `docker-compose.dev.yml` — Dev Stack
 - `package.json`
 - `tsconfig.json`
