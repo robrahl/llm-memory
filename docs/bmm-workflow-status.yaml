@@ -115,12 +115,95 @@ v1_planning:
   - health_dashboard: "Simple HTML status page"
   - automated_backups: "Daily Postgres dumps"
 
+# V1.1 Planning (Web Control Interface)
+v1_1_planning:
+  description: "Web-based dashboard for system status, policy viewing, and dynamic policy management"
+  features:
+    - name: "System Status Dashboard"
+      description: "Real-time health check - Agent, Postgres, Ollama status with uptime metrics"
+      implementation: "React SPA, fetch /health every 30s"
+      complexity: "low"
+      
+    - name: "Policy Browser"
+      description: "View all policies, search by key/description, display with metadata"
+      implementation: "Table with search/filter, fetch from /policies endpoint"
+      complexity: "low"
+      
+    - name: "Dynamic Policy Add"
+      description: "Web form to add/edit policies without CLI - POST to /policy endpoint"
+      implementation: "Form validation, real-time persistence to Postgres"
+      complexity: "medium"
+      
+    - name: "Query Tester"
+      description: "Test queries against agent, see results with latency metrics"
+      implementation: "Text input, submit to /query, display response + sources"
+      complexity: "low"
+      
+    - name: "Policy History"
+      description: "View policy change history (when, what, by whom)"
+      implementation: "Timeline view from policy_versions table"
+      complexity: "medium"
+
+  tech_stack:
+    - frontend: "React 18 + TypeScript + Vite"
+    - styling: "Tailwind CSS (simple, no components needed)"
+    - state: "React hooks (no Redux needed for single-user)"
+    - api: "fetch API to agent endpoints"
+    - deployment: "Static bundle served from Agent on /ui route"
+
+  deliverables:
+    - src/ui/index.tsx: "React app entry point"
+    - src/ui/components/Dashboard.tsx: "Main dashboard layout"
+    - src/ui/components/PolicyBrowser.tsx: "Policy list and search"
+    - src/ui/components/PolicyForm.tsx: "Add/edit policy form"
+    - src/ui/components/QueryTester.tsx: "Test queries"
+    - src/ui/styles/main.css: "Tailwind configuration"
+    - scripts/build-ui.sh: "Build and bundle UI"
+    - agent.ts: "Add /ui/* static routes"
+
+  timeline:
+    phase_1: "Core dashboard + health check (2 days)"
+    phase_2: "Policy browser + query tester (2 days)"
+    phase_3: "Dynamic policy add + history (3 days)"
+    phase_4: "Testing + polish (1 day)"
+    total: "~1 week"
+
+  acceptance_criteria:
+    - "Dashboard shows real-time agent health"
+    - "All 21 policies visible in browser"
+    - "Can add new policy via form without CLI"
+    - "Query tester returns results within 500ms"
+    - "Policy history shows audit trail"
+    - "Works on localhost:3000/ui"
+    - "Mobile-friendly responsive design"
+
 # Critical Path (Next 48 Hours)
 critical_path:
   - validate_v0_e2e: "Full workflow test: load policies → query → generate context"
   - documentation: "Complete V0_QUICK_START.md and test it"
   - commit_and_tag: "Git tag v0.1.0 for stable baseline"
   - prepare_v1_kickoff: "Document V1 requirements"
+  - plan_v1_1: "Web UI planning and design (started)"
+
+# Roadmap Summary
+roadmap:
+  v0:
+    status: "✅ COMPLETE"
+    focus: "Core agent functionality, policy persistence, CLI interface"
+    release_date: "2025-11-17"
+  
+  v1:
+    status: "🔄 PLANNED"
+    focus: "MCP integration, policy versioning, indexer robustness"
+    release_date: "~2025-12-01"
+    dependencies: ["v0 stable"]
+  
+  v1_1:
+    status: "📋 PLANNED"
+    focus: "Web control dashboard for status, policies, and management"
+    release_date: "~2025-12-08"
+    dependencies: ["v1 complete"]
+    value: "Non-technical policy management, system visibility, testing interface"
 
 # Risks & Mitigations
 risks:
