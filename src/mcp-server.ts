@@ -134,7 +134,7 @@ server.tool(
     code_snippet: z.string().describe("Code or design to check"),
     policy_key: z.string().optional().describe("Specific policy to check against (optional)"),
   },
-  async ({ code_snippet, policy_key }) => {
+  async ({ code_snippet }) => {
     try {
       const response = await fetch(`${AGENT_URL}/query`, {
         method: "POST",
@@ -632,7 +632,7 @@ server.tool(
       const result = await response.json();
 
       // Build metrics object
-      const metrics: any = {
+      const metrics: Record<string, unknown> = {
         queries: result.queries || {
           total: 0,
           avg_latency_ms: 0,
@@ -657,7 +657,7 @@ server.tool(
 
       // Filter by metric_types if specified
       if (metric_types && metric_types.length > 0) {
-        const filtered: any = {};
+        const filtered: Record<string, unknown> = {};
         for (const type of metric_types) {
           if (type in metrics) {
             filtered[type] = metrics[type];
@@ -725,12 +725,15 @@ async function main() {
   const transport = new StdioServerTransport();
   await server.connect(transport);
 
+  /* eslint-disable no-console */
   console.error(`[llm-memory MCP V2.0] Server started`);
   console.error(`[llm-memory MCP V2.0] Connected to Agent at ${AGENT_URL}`);
   console.error(`[llm-memory MCP V2.0] Available tools: 8 (4 V1 + 4 V2.0)`);
+  /* eslint-enable no-console */
 }
 
 main().catch((error) => {
+  // eslint-disable-next-line no-console
   console.error("[llm-memory MCP] Fatal error:", error);
   process.exit(1);
 });
