@@ -103,13 +103,13 @@ function Test-AgentHealth {
             -TimeoutSec 10
         
         $status = if ($health.status) { $health.status } else { "unknown" }
-        $dbStatus = if ($health.services.db) { $health.services.db } else { "unknown" }
-        $llmStatus = if ($health.services.llm) { $health.services.llm } else { "unknown" }
+        $dbStatus = if ($health.postgres) { $health.postgres } else { "unknown" }
+        $llmStatus = if ($health.ollama) { $health.ollama } else { "unknown" }
         
         if ($status -eq "ok") {
             Write-Host "[+] Agent: $status" -ForegroundColor Green
-            Write-Host "[+] Database: $dbStatus" -ForegroundColor Green
-            Write-Host "[+] LLM: $llmStatus" -ForegroundColor Green
+            Write-Host "[+] Postgres: $dbStatus" -ForegroundColor Green
+            Write-Host "[+] Ollama: $llmStatus" -ForegroundColor Green
             return $true
         }
         else {
