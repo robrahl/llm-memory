@@ -18,17 +18,16 @@ const pool = new Pool({ connectionString: DATABASE_URL });
 app.get('/health', async (_req: Request, res: Response) => {
   const status = {
     status: 'ok',
-    services: {
-      db: 'unknown',
-      llm: 'unknown',
-    },
+    postgres: 'unknown',
+    ollama: 'unknown',
   } as any;
 
   try {
     await pool.query('SELECT 1');
-    status.services.db = 'healthy';
+    status.postgres = 'connected';
   } catch (err: any) {
-    status.services.db = 'unhealthy';
+    status.postgres = 'disconnected';
+    status.status = 'degraded';
     status.db_error = err?.message;
   }
 
@@ -51,9 +50,13 @@ app.get('/health', async (_req: Request, res: Response) => {
         healthy = r2.status === 200;
       }
     }
-    status.services.llm = healthy ? 'healthy' : 'unhealthy';
+    status.ollama = healthy ? 'reachable' : 'unreachable';
+    if (!healthy) {
+      status.status = status.postgres === 'connected' ? 'degraded' : 'degraded';
+    }
   } catch {
-    status.services.llm = 'unreachable';
+    status.ollama = 'unreachable';
+    status.status = status.postgres === 'connected' ? 'degraded' : 'degraded';
   }
 
   res.json(status);

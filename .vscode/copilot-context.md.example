@@ -1,0 +1,34 @@
+# llm-memory Context for Copilot
+
+**Generated:** 2025-11-17 18:56:00
+**Query:** naming convention
+
+## Agent Response
+
+```json
+{
+  "answer": "Based on our architectural policies, we follow these naming conventions:\n\n1. Services: Use PascalCase with 'Service' suffix (e.g., UserService, AuthService)\n2. Database tables: Use snake_case plural (e.g., user_profiles, api_tokens)\n3. API endpoints: Use kebab-case (e.g., /api/user-profiles, /health-check)\n4. TypeScript interfaces: Use PascalCase with 'I' prefix (e.g., IUserProfile, IApiResponse)\n5. Environment variables: Use UPPER_SNAKE_CASE (e.g., DATABASE_URL, LLM_BASE_URL)",
+  "sources": [
+    {
+      "key": "naming_conventions",
+      "excerpt": "Services use PascalCase with Service suffix. Database tables use snake_case. API endpoints use kebab-case. TypeScript interfaces use PascalCase with I prefix..."
+    }
+  ],
+  "latency_ms": 234
+}
+```
+
+## How to Use
+
+1. Reference this context in Copilot chat:
+   - "Based on the context in .vscode/copilot-context.md, ..."
+   - "Following our policies from llm-memory, ..."
+
+2. Copy specific policies/answers from above into your prompt
+
+3. Generate new context: `./scripts/copilot-context.sh "your question"`
+
+---
+
+**Note:** This context is auto-generated and expires after 1 hour.
+Refresh by running the script again.
