@@ -64,11 +64,12 @@ A lightweight, single-page web dashboard for:
 ### Frontend Stack
 ```
 Frontend:
-  - React 18 (functional components + hooks)
+  - Vue 3 (Composition API)
   - TypeScript (type safety)
   - Vite (build tool, fast HMR)
   - Tailwind CSS (styling, utility-first)
   - Axios or fetch (HTTP calls)
+  - Pinia (lightweight state management)
 
 Deployment:
   - Build to /dist/ui
@@ -95,17 +96,17 @@ app.post('/policies/:key/history', async (req, res) => { /* audit trail */ });
 src/
   ui/
     components/
-      Dashboard.tsx        # Main layout + health status
-      PolicyBrowser.tsx    # Policy list, search, details
-      PolicyForm.tsx       # Add/edit policy form
-      QueryTester.tsx      # Test queries
-      StatusCard.tsx       # Reusable status display
-      SearchBar.tsx        # Filter/search input
+      Dashboard.vue        # Main layout + health status
+      PolicyBrowser.vue    # Policy list, search, details
+      PolicyForm.vue       # Add/edit policy form
+      QueryTester.vue      # Test queries
+      StatusCard.vue       # Reusable status display
+      SearchBar.vue        # Filter/search input
     pages/
-      Home.tsx             # Main page
-    App.tsx                # Router, root component
+      Home.vue             # Main page
+    App.vue                # Root component
+    main.ts                # Entry point
     index.css              # Tailwind + global styles
-    main.tsx               # Entry point
   ui-build.config.ts       # Vite config
 
 scripts/
@@ -125,8 +126,8 @@ dist/
 ### Step 1: Project Setup (2 hours)
 ```bash
 # Install dependencies
-npm install -D react @types/react react-dom @types/react-dom
-npm install -D vite @vitejs/plugin-react
+npm install -D vue @vitejs/plugin-vue
+npm install -D vite
 npm install -D tailwindcss postcss autoprefixer
 npm install axios
 
@@ -137,9 +138,10 @@ npx tailwindcss init -p
 mkdir -p src/ui/components src/ui/pages
 ```
 
-### Step 2: Vite + React Setup (1 hour)
-- Create `vite.config.ts` (output to dist/ui)
-- Create `src/ui/main.tsx` (React entry)
+### Step 2: Vite + Vue Setup (1 hour)
+- Create `vite.config.ts` with @vitejs/plugin-vue (output to dist/ui)
+- Create `src/ui/main.ts` (Vue entry point)
+- Create `src/ui/App.vue` (root component)
 - Create `src/ui/index.css` (Tailwind directives)
 - Test: `npm run dev:ui` → http://localhost:5173
 
@@ -235,9 +237,9 @@ Add workflow to build UI on push, commit built files to repo.
 | Decision | Why |
 |----------|-----|
 | **Single Page App (SPA)** | Simple, fast, no backend routing needed |
-| **React + Hooks** | Lightweight, familiar, no class complexity |
+| **Vue 3 Composition API** | Lightweight, reactive, simpler than React hooks |
 | **Tailwind CSS** | No component library overhead, utility-first = fast |
-| **No Redux/Context** | Single user, simple state (health, policies list) |
+| **Pinia for State** | Minimal store pattern for policies list and health |
 | **Client-side search** | Policies list small (<100), filter instantly |
 | **Served from Agent** | No separate frontend server, one binary |
 
