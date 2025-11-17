@@ -19,5 +19,6 @@
     "no-console": "warn",
     "@typescript-eslint/no-explicit-any": "warn",
     "@typescript-eslint/explicit-module-boundary-types": "off"
-  }
+  },
+  "ignorePatterns": ["src/ui/**", "src/mcp-server.ts"]
 }
