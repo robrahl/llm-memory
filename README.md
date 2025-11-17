@@ -12,7 +12,8 @@ Local developer AI agent with persistent memory and Copilot integration.
   - `docs/V0_QUICK_START.md` — 5-minute setup guide for V0 (START HERE!)
   - `docs/copilot-v0-integration.md` — Detailed V0 integration guide
   - `docs/COPILOT_INTEGRATION.md` — Copilot V0/V1 integration summary
-  - `docs/copilot-v1-mcp.md` — V1 MCP integration (future)
+  - `docs/copilot-v1-mcp.md` — V1 MCP integration
+  - `docs/copilot-v2-mcp.md` — V2.0 MCP integration (advanced tools)
   - `docs/prd.md` — Project Design Review
   - `docs/architecture.md` — Architecture specification
   - `docs/COPILOT_QUICK_REF.md` — Quick prompts for Copilot
