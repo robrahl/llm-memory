@@ -1,37 +1,34 @@
 <template>
-  <div>
-    <!-- Navigation Tabs with Bootstrap -->
-    <ul class="nav nav-tabs mb-4 border-bottom" role="tablist">
-      <li class="nav-item" role="presentation" v-for="tab in tabs" :key="tab.id">
-        <button
-          :class="['nav-link', { active: activeTab === tab.id }]"
-          :id="`${tab.id}-tab`"
-          @click="activeTab = tab.id"
-          type="button"
-          role="tab"
-        >
-          <span style="margin-right: 0.5rem">{{ tab.icon }}</span>
-          {{ tab.name }}
-        </button>
-      </li>
-    </ul>
-    
-    <!-- Tab Content -->
-    <div class="tab-content">
-      <div v-if="activeTab === 'dashboard'" class="tab-pane fade show active">
-        <Dashboard />
-      </div>
-      <div v-if="activeTab === 'policies'" class="tab-pane fade show active">
-        <PolicyBrowser />
-      </div>
-      <div v-if="activeTab === 'query'" class="tab-pane fade show active">
-        <QueryTester />
-      </div>
-      <div v-if="activeTab === 'add'" class="tab-pane fade show active">
-        <PolicyForm />
-      </div>
-    </div>
-  </div>
+  <!-- Navigation Tabs in Navbar style -->
+  <ul class="navbar-nav me-auto" style="border-bottom: 2px solid #e9ecef; margin: -0.5rem 0 0.5rem 0">
+    <li class="nav-item" role="presentation" v-for="tab in tabs" :key="tab.id">
+      <button
+        :class="['nav-link', { active: activeTab === tab.id }]"
+        :id="`${tab.id}-tab`"
+        @click="activeTab = tab.id"
+        type="button"
+        role="tab"
+        style="padding: 0.75rem 1rem; font-size: 0.95rem"
+      >
+        <span style="margin-right: 0.5rem">{{ tab.icon }}</span>
+        {{ tab.name }}
+      </button>
+    </li>
+  </ul>
+  
+  <!-- Tab Content - rendered in main below navbar -->
+  <template v-if="activeTab === 'dashboard'">
+    <Dashboard />
+  </template>
+  <template v-else-if="activeTab === 'policies'">
+    <PolicyBrowser />
+  </template>
+  <template v-else-if="activeTab === 'query'">
+    <QueryTester />
+  </template>
+  <template v-else-if="activeTab === 'add'">
+    <PolicyForm />
+  </template>
 </template>
 
 <script setup lang="ts">

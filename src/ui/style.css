@@ -28,14 +28,37 @@ body {
 /* Bootstrap overrides & enhancements */
 .navbar {
   padding: 0.75rem 0;
-  background-color: #ffffff !important;
+  background-color: #212529 !important;
+  border-bottom: 1px solid #343a40;
 }
 
 .navbar-brand {
-  font-size: 1.25rem;
+  font-size: 1.15rem;
   font-weight: 700;
   letter-spacing: 0.5px;
+  color: #ffffff !important;
+  transition: opacity 0.2s ease;
+}
+
+.navbar-brand:hover {
+  opacity: 0.8;
+}
+
+.navbar-nav .nav-link {
+  color: #adb5bd !important;
+  transition: all 0.2s ease;
+  border-bottom: 2px solid transparent;
+}
+
+.navbar-nav .nav-link:hover {
+  color: #ffffff !important;
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.navbar-nav .nav-link.active {
   color: #0d6efd !important;
+  border-bottom-color: #0d6efd;
+  font-weight: 500;
 }
 
 .hero-section {
