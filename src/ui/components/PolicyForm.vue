@@ -1,79 +1,66 @@
 <template>
-  <div class="space-y-4">
-    <h2 class="text-2xl font-bold text-gray-900">Add/Edit Policy</h2>
-    
-    <div class="bg-white rounded-lg shadow p-6">
-      <form @submit.prevent="handleSubmit" class="space-y-4">
-        <div>
-          <label for="policy-key" class="block text-sm font-medium text-gray-700 mb-2">
-            Policy Key <span class="text-red-500">*</span>
-          </label>
-          <input
-            id="policy-key"
-            v-model="formData.key"
-            type="text"
-            required
-            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            placeholder="e.g., naming-conventions"
-          />
-          <p class="text-sm text-gray-500 mt-1">Use kebab-case for policy keys</p>
-        </div>
+  <div>
+    <h2 class="h4 mb-4 fw-bold">
+      <span>➕</span> Add New Policy
+    </h2>
+    <div class="card border-0 shadow-sm">
+      <div class="card-body">
+        <form @submit.prevent="handleSubmit">
+          <div class="mb-4">
+            <label class="form-label fw-bold">Policy Key <span class="text-danger">*</span></label>
+            <input
+              v-model="formData.key"
+              type="text"
+              required
+              placeholder="e.g., naming-convention"
+              class="form-control"
+            />
+            <small class="form-text text-secondary">Use kebab-case</small>
+          </div>
 
-        <div>
-          <label for="policy-description" class="block text-sm font-medium text-gray-700 mb-2">
-            Description
-          </label>
-          <textarea
-            id="policy-description"
-            v-model="formData.description"
-            rows="2"
-            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            placeholder="Brief description of what this policy defines"
-          ></textarea>
-        </div>
+          <div class="mb-4">
+            <label class="form-label fw-bold">Description</label>
+            <textarea
+              v-model="formData.description"
+              rows="2"
+              placeholder="Brief description of this policy..."
+              class="form-control"
+            ></textarea>
+          </div>
 
-        <div>
-          <label for="policy-value" class="block text-sm font-medium text-gray-700 mb-2">
-            Value <span class="text-red-500">*</span>
-          </label>
-          <textarea
-            id="policy-value"
-            v-model="formData.value"
-            rows="8"
-            required
-            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono text-sm"
-            placeholder="Enter the policy value (text or JSON)"
-          ></textarea>
-          <p class="text-sm text-gray-500 mt-1">
-            Can be plain text or JSON. If JSON, it will be validated.
-          </p>
-        </div>
+          <div class="mb-4">
+            <label class="form-label fw-bold">Policy Value (JSON) <span class="text-danger">*</span></label>
+            <textarea
+              v-model="formData.value"
+              rows="8"
+              required
+              placeholder='{\n  "rule": "value",\n  "details": "..."\n}'
+              class="form-control font-monospace"
+              style="font-size: 0.875rem"
+            ></textarea>
+          </div>
 
-        <div v-if="error" class="p-3 bg-red-50 border border-red-200 rounded-lg">
-          <p class="text-sm text-red-800">{{ error }}</p>
-        </div>
+          <div v-if="error" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <span>❌ {{ error }}</span>
+            <button type="button" class="btn-close" @click="error = ''"></button>
+          </div>
 
-        <div v-if="success" class="p-3 bg-green-50 border border-green-200 rounded-lg">
-          <p class="text-sm text-green-800">Policy created successfully!</p>
-        </div>
+          <div v-if="success" class="alert alert-success alert-dismissible fade show" role="alert">
+            <span>✅ Policy created successfully!</span>
+            <button type="button" class="btn-close" @click="success = false"></button>
+          </div>
 
-        <div class="flex space-x-3">
-          <button
-            type="submit"
-            :disabled="loading"
-            class="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
-          >
-            {{ loading ? 'Saving...' : 'Save Policy' }}
-          </button>
-          <button
-            type="button"
-            @click="resetForm"
-            class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 font-medium"
-          >
-            Clear
-          </button>
-        </div>
-      </form>
+          <div class="d-flex gap-2">
+            <button type="submit" :disabled="loading" class="btn btn-primary flex-grow-1">
+              <span>{{ loading ? '⏳' : '💾' }}</span>
+              {{ loading ? 'Saving...' : 'Add Policy' }}
+            </button>
+            <button type="button" @click="resetForm" class="btn btn-outline-secondary">
+              Clear
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   </div>
 </template>

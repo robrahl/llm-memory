@@ -1,58 +1,35 @@
 <template>
-  <div class="space-y-4">
-    <div class="flex items-center justify-between">
-      <h2 class="text-2xl font-bold text-gray-900">Policy Browser</h2>
-      <button
-        @click="refreshPolicies"
-        :disabled="loading"
-        class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
-      >
-        {{ loading ? 'Loading...' : 'Refresh' }}
-      </button>
-    </div>
-
+  <div>
+    <h2 class="h4 mb-4 fw-bold">
+      <span>📚</span> Browse Policies
+    </h2>
     <SearchBar v-model="searchQuery" />
-
-    <div v-if="loading && policies.length === 0" class="text-center py-8">
-      <p class="text-gray-600">Loading policies...</p>
+    
+    <div v-if="loading" class="text-center py-5">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+      <p class="mt-2 text-secondary">⏳ Loading policies...</p>
     </div>
-
-    <div v-else-if="filteredPolicies.length === 0" class="text-center py-8">
-      <p class="text-gray-600">No policies found.</p>
+    
+    <div v-else-if="filteredPolicies.length === 0" class="text-center py-5">
+      <p class="text-secondary">📭 No policies found</p>
     </div>
-
-    <div v-else class="space-y-3">
-      <div
-        v-for="policy in filteredPolicies"
-        :key="policy.key"
-        class="bg-white rounded-lg shadow hover:shadow-md transition-shadow cursor-pointer"
-        @click="togglePolicy(policy.key)"
-      >
-        <div class="p-4">
-          <div class="flex items-start justify-between">
-            <div class="flex-1">
-              <h3 class="text-lg font-semibold text-gray-900">{{ policy.key }}</h3>
-              <p v-if="policy.description" class="text-sm text-gray-600 mt-1">
-                {{ policy.description }}
-              </p>
+    
+    <div v-else class="row g-3" style="max-height: 500px; overflow-y: auto">
+      <div class="col-md-6" v-for="policy in filteredPolicies" :key="policy.key">
+        <div class="card h-100 border-0 shadow-sm" @click="togglePolicy(policy.key)" style="cursor: pointer">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-start mb-2">
+              <h5 class="card-title mb-0 text-primary">{{ policy.key }}</h5>
+              <span class="text-muted">{{ expandedPolicies.has(policy.key) ? '▼' : '▶' }}</span>
             </div>
-            <button
-              class="ml-4 text-gray-400 hover:text-gray-600"
-              @click.stop="togglePolicy(policy.key)"
-            >
-              {{ expandedPolicies.has(policy.key) ? '▼' : '▶' }}
-            </button>
-          </div>
-
-          <div v-if="expandedPolicies.has(policy.key)" class="mt-4 pt-4 border-t border-gray-200">
-            <div class="space-y-2">
-              <div>
-                <p class="text-sm font-medium text-gray-700">Value:</p>
-                <pre class="mt-1 p-3 bg-gray-50 rounded text-sm overflow-x-auto">{{ formatValue(policy.value) }}</pre>
-              </div>
-              <div v-if="policy.updated_at" class="flex items-center text-sm text-gray-500">
-                <span>Last updated: {{ new Date(policy.updated_at).toLocaleString() }}</span>
-              </div>
+            <p class="card-text small text-secondary">{{ policy.description }}</p>
+            <code class="bg-light p-2 d-block rounded small font-monospace">{{ truncate(formatValue(policy.value)) }}</code>
+            <small class="text-muted d-block mt-2">🕐 {{ new Date(policy.updated_at).toLocaleString() }}</small>
+            
+            <div v-if="expandedPolicies.has(policy.key)" class="mt-3 pt-3 border-top">
+              <pre class="bg-light p-3 rounded small font-monospace" style="overflow-x: auto; max-height: 300px">{{ formatValue(policy.value) }}</pre>
             </div>
           </div>
         </div>
@@ -105,6 +82,10 @@ const formatValue = (value: any): string => {
     }
   }
   return JSON.stringify(value, null, 2);
+};
+
+const truncate = (str: string, len: number = 100): string => {
+  return str.length > len ? str.substring(0, len) + '...' : str;
 };
 
 const refreshPolicies = async () => {

@@ -1,30 +1,35 @@
 <template>
-  <div class="space-y-8">
-    <!-- Navigation Tabs -->
-    <div class="border-b border-gray-200">
-      <nav class="-mb-px flex space-x-8">
+  <div>
+    <!-- Navigation Tabs with Bootstrap -->
+    <ul class="nav nav-tabs mb-4 border-bottom" role="tablist">
+      <li class="nav-item" role="presentation" v-for="tab in tabs" :key="tab.id">
         <button
-          v-for="tab in tabs"
-          :key="tab.id"
+          :class="['nav-link', { active: activeTab === tab.id }]"
+          :id="`${tab.id}-tab`"
           @click="activeTab = tab.id"
-          :class="[
-            activeTab === tab.id
-              ? 'border-blue-500 text-blue-600'
-              : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300',
-            'whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm'
-          ]"
+          type="button"
+          role="tab"
         >
+          <span style="margin-right: 0.5rem">{{ tab.icon }}</span>
           {{ tab.name }}
         </button>
-      </nav>
-    </div>
-
+      </li>
+    </ul>
+    
     <!-- Tab Content -->
-    <div>
-      <Dashboard v-if="activeTab === 'dashboard'" />
-      <PolicyBrowser v-else-if="activeTab === 'policies'" />
-      <QueryTester v-else-if="activeTab === 'query'" />
-      <PolicyForm v-else-if="activeTab === 'add'" />
+    <div class="tab-content">
+      <div v-if="activeTab === 'dashboard'" class="tab-pane fade show active">
+        <Dashboard />
+      </div>
+      <div v-if="activeTab === 'policies'" class="tab-pane fade show active">
+        <PolicyBrowser />
+      </div>
+      <div v-if="activeTab === 'query'" class="tab-pane fade show active">
+        <QueryTester />
+      </div>
+      <div v-if="activeTab === 'add'" class="tab-pane fade show active">
+        <PolicyForm />
+      </div>
     </div>
   </div>
 </template>
@@ -39,9 +44,9 @@ import PolicyForm from '../components/PolicyForm.vue';
 const activeTab = ref('dashboard');
 
 const tabs = [
-  { id: 'dashboard', name: 'Dashboard' },
-  { id: 'policies', name: 'Policy Browser' },
-  { id: 'query', name: 'Query Tester' },
-  { id: 'add', name: 'Add Policy' },
+  { id: 'dashboard', name: 'Dashboard', icon: '📊' },
+  { id: 'policies', name: 'Policy Browser', icon: '📚' },
+  { id: 'query', name: 'Query Tester', icon: '🔍' },
+  { id: 'add', name: 'Add Policy', icon: '➕' },
 ];
 </script>

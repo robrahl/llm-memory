@@ -1,44 +1,64 @@
 <template>
-  <div class="space-y-6">
-    <div>
-      <h2 class="text-2xl font-bold text-gray-900 mb-4">System Status</h2>
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <StatusCard
-          title="Agent"
-          description="Agent server status"
-          :status="health?.status || 'unknown'"
-        />
-        <StatusCard
-          title="PostgreSQL"
-          description="Database connection"
-          :status="health?.postgres || 'unknown'"
-        />
-        <StatusCard
-          title="LLM Provider"
-          description="Ollama/LLM availability"
-          :status="health?.ollama || 'unknown'"
-        />
+  <div class="row">
+    <!-- System Status Section -->
+    <div class="col-12 mb-4">
+      <h2 class="h4 mb-4 fw-bold">
+        <span>🔧</span> System Status
+      </h2>
+      <div class="row g-3">
+        <div class="col-lg-4">
+          <StatusCard
+            title="Agent Server"
+            description="Agent status"
+            :status="health?.status || 'unknown'"
+          />
+        </div>
+        <div class="col-lg-4">
+          <StatusCard
+            title="PostgreSQL"
+            description="Database connection"
+            :status="health?.postgres || 'unknown'"
+          />
+        </div>
+        <div class="col-lg-4">
+          <StatusCard
+            title="LLM Provider"
+            description="Ollama availability"
+            :status="health?.ollama || 'unknown'"
+          />
+        </div>
       </div>
     </div>
 
-    <div class="bg-white rounded-lg shadow p-6">
-      <div class="flex items-center justify-between mb-4">
-        <h3 class="text-lg font-semibold text-gray-900">Quick Stats</h3>
-        <button
-          @click="refreshHealth"
-          class="text-sm text-blue-600 hover:text-blue-800 font-medium"
-        >
-          Refresh
-        </button>
-      </div>
-      <div class="grid grid-cols-2 gap-4">
-        <div>
-          <p class="text-sm text-gray-600">Total Policies</p>
-          <p class="text-2xl font-bold text-gray-900">{{ policyCount }}</p>
-        </div>
-        <div>
-          <p class="text-sm text-gray-600">Last Checked</p>
-          <p class="text-sm font-medium text-gray-900">{{ lastChecked }}</p>
+    <!-- Quick Stats -->
+    <div class="col-12">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <h5 class="card-title m-0">
+              <span>📈</span> Quick Stats
+            </h5>
+            <button
+              @click="refreshHealth"
+              class="btn btn-sm btn-primary"
+            >
+              <span>🔄</span> Refresh
+            </button>
+          </div>
+          <div class="row">
+            <div class="col-lg-6">
+              <div class="bg-light p-3 rounded border-start border-primary border-4">
+                <small class="text-secondary d-block mb-1">Total Policies</small>
+                <h2 class="h3 m-0 text-primary fw-bold">{{ policyCount }}</h2>
+              </div>
+            </div>
+            <div class="col-lg-6 mt-3 mt-lg-0">
+              <div class="bg-light p-3 rounded border-start border-info border-4">
+                <small class="text-secondary d-block mb-1">Last Checked</small>
+                <h2 class="h5 m-0 text-info font-monospace">{{ lastChecked }}</h2>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>

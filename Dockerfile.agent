@@ -12,6 +12,7 @@ RUN npm install --no-audit --no-fund
 COPY src ./src
 COPY tsconfig.json ./
 COPY healthcheck.js ./
+COPY ui ./ui
 
 # Build TypeScript (for production usage; dev uses tsx runner)
 RUN npm run build || true
