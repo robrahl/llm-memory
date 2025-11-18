@@ -2,8 +2,13 @@ import express, { type Request, type Response } from 'express';
 import axios from 'axios';
 import { Pool } from 'pg';
 import dotenv from 'dotenv';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
 dotenv.config();
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 app.use(express.json({ limit: '1mb' }));
@@ -85,6 +90,37 @@ app.post('/policy', async (req: Request, res: Response) => {
   }
 });
 
+app.get('/policies', async (_req: Request, res: Response) => {
+  try {
+    const result = await pool.query(
+      `SELECT key, description, value, created_at, updated_at
+       FROM architectural_policies
+       ORDER BY key ASC`
+    );
+    res.json(result.rows);
+  } catch (err: any) {
+    res.status(500).json({ error: 'db_error', message: err?.message });
+  }
+});
+
+app.get('/policies/:key', async (req: Request, res: Response) => {
+  const { key } = req.params;
+  try {
+    const result = await pool.query(
+      `SELECT key, description, value, created_at, updated_at
+       FROM architectural_policies
+       WHERE key = $1`,
+      [key]
+    );
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'policy_not_found' });
+    }
+    res.json(result.rows[0]);
+  } catch (err: any) {
+    res.status(500).json({ error: 'db_error', message: err?.message });
+  }
+});
+
 app.post('/query', async (req: Request, res: Response) => {
   const started = Date.now();
   const { query, topK } = req.body || {};
@@ -155,6 +191,15 @@ app.post('/query', async (req: Request, res: Response) => {
   } catch (err: any) {
     return res.status(500).json({ error: 'db_error', message: err?.message });
   }
+});
+
+// Serve static UI files
+const uiPath = path.join(__dirname, '../ui');
+app.use('/ui', express.static(uiPath));
+
+// SPA fallback - serve index.html for all /ui/* routes
+app.get('/ui/*', (_req: Request, res: Response) => {
+  res.sendFile(path.join(uiPath, 'index.html'));
 });
 
 app.use((_req: Request, res: Response) => {
