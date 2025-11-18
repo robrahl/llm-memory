@@ -194,7 +194,7 @@ app.post('/query', async (req: Request, res: Response) => {
 });
 
 // Serve static UI files
-const uiPath = path.join(__dirname, '../ui');
+const uiPath = path.join(__dirname, '../dist/ui');
 app.use('/ui', express.static(uiPath));
 
 // SPA fallback - serve index.html for all /ui/* routes

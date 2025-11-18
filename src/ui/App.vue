@@ -42,7 +42,7 @@
     </main>
 
     <!-- Footer -->
-    <footer class="border-top bg-white mt-5 py-4">
+    <footer class="border-top bg-white mt-auto py-3">
       <div class="container-lg">
         <p class="mb-0 text-center text-secondary small">
           llm-memory v1.1 • Powered by Vue 3 + Bootstrap 5
