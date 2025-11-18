@@ -1,5 +1,5 @@
 <template>
-  <div class="d-flex flex-column" style="min-height: 100vh; background: linear-gradient(180deg, #f8f9fa 0%, #e9ecef 100%)">
+  <div class="d-flex flex-column" :class="[appStore.theme === 'dark' ? 'dark-theme' : 'light-theme']" style="min-height: 100vh">
     <!-- Navigation Bar (Dream Gallery style) -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top shadow-sm py-3">
       <div class="container-lg">
@@ -25,6 +25,17 @@
                 <span>{{ link.title }}</span>
               </RouterLink>
             </li>
+            <li class="nav-item">
+              <button 
+                @click="appStore.toggleTheme()" 
+                class="btn btn-sm btn-outline-light d-flex align-items-center gap-2"
+                style="margin-left: 0.5rem; border: 1px solid rgba(255,255,255,0.3); padding: 0.5rem 1rem; font-size: 0.95rem"
+                :title="appStore.theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'"
+              >
+                <span>{{ appStore.theme === 'dark' ? '☀️' : '🌙' }}</span>
+                <span class="d-none d-lg-inline">{{ appStore.theme === 'dark' ? 'Light' : 'Dark' }}</span>
+              </button>
+            </li>
           </ul>
         </div>
       </div>
@@ -38,9 +49,9 @@
     </main>
 
     <!-- Footer -->
-    <footer class="border-top bg-white mt-auto py-3">
+    <footer class="border-top mt-auto py-3" style="border-color: #333">
       <div class="container-lg">
-        <p class="mb-0 text-center text-secondary small">
+        <p class="mb-0 text-center small">
           llm-memory v1.1 • Powered by Vue 3 + Bootstrap 5
         </p>
       </div>
@@ -50,8 +61,10 @@
 
 <script setup lang="ts">
 import { RouterLink, RouterView, useRoute } from 'vue-router';
-import { computed } from 'vue';
+import { onMounted } from 'vue';
+import { useAppStore } from './stores/app';
 
+const appStore = useAppStore();
 const route = useRoute();
 
 const navLinks = [
@@ -64,4 +77,8 @@ const navLinks = [
 const isActive = (path: string) => {
   return route.path === path;
 };
+
+onMounted(() => {
+  appStore.initTheme();
+});
 </script>

@@ -27,6 +27,7 @@ export const useAppStore = defineStore('app', () => {
   const policies = ref<Policy[]>([]);
   const loading = ref(false);
   const error = ref<string | null>(null);
+  const theme = ref<'light' | 'dark'>('dark');
 
   async function fetchHealth() {
     try {
@@ -84,14 +85,38 @@ export const useAppStore = defineStore('app', () => {
     }
   }
 
+  function initTheme() {
+    const savedTheme = localStorage.getItem('theme') as 'light' | 'dark' | null;
+    theme.value = savedTheme || 'dark';
+    applyTheme(theme.value);
+  }
+
+  function toggleTheme() {
+    theme.value = theme.value === 'dark' ? 'light' : 'dark';
+    applyTheme(theme.value);
+    localStorage.setItem('theme', theme.value);
+  }
+
+  function applyTheme(themeMode: 'light' | 'dark') {
+    const htmlElement = document.documentElement;
+    if (themeMode === 'dark') {
+      htmlElement.setAttribute('data-theme', 'dark');
+    } else {
+      htmlElement.setAttribute('data-theme', 'light');
+    }
+  }
+
   return {
     health,
     policies,
     loading,
     error,
+    theme,
     fetchHealth,
     fetchPolicies,
     createPolicy,
     queryAgent,
+    initTheme,
+    toggleTheme,
   };
 });
