@@ -23,6 +23,13 @@ CREATE TABLE IF NOT EXISTS documents (
 );
 
 -- Create vector index (ivfflat for fast similarity search)
+-- Performance tuning notes:
+-- - lists: Number of inverted lists (clusters). Recommended: sqrt(rows) to 10*sqrt(rows)
+-- - For < 1M rows: lists = 100 is a good default
+-- - For 1M+ rows: Consider lists = 1000 or more
+-- - Probe count (set at query time): Adjust probes in queries for speed vs accuracy tradeoff
+-- - Index build requires at least 'lists' number of rows; index builds automatically after rows exist
+-- - Use HNSW index for better recall at the cost of slightly slower build time (PostgreSQL 14+)
 CREATE INDEX IF NOT EXISTS idx_documents_embedding 
   ON documents USING ivfflat (embedding vector_cosine_ops) WITH (lists = 100);
 
@@ -97,3 +104,54 @@ CREATE TRIGGER update_policies_updated_at BEFORE UPDATE ON architectural_policie
 
 CREATE TRIGGER update_documents_updated_at BEFORE UPDATE ON documents
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+-- ===================================================================
+-- PERFORMANCE OPTIMIZATION NOTES
+-- ===================================================================
+--
+-- Vector Search Index Tuning:
+-- 
+-- 1. IVFFlat Index Configuration:
+--    - lists parameter: Number of clusters for inverted file index
+--    - Formula: lists = sqrt(total_rows) to 10 * sqrt(rows)
+--    - Examples:
+--      * 10,000 rows   → lists = 100 (current default)
+--      * 100,000 rows  → lists = 316 to 1000
+--      * 1,000,000 rows → lists = 1000 to 3162
+--
+-- 2. Query-time Tuning (adjust probes):
+--    SET ivfflat.probes = 10;  -- Default
+--    SET ivfflat.probes = 20;  -- Better recall, slower
+--    SET ivfflat.probes = 5;   -- Faster, lower recall
+--
+-- 3. Alternative Index (HNSW - better recall):
+--    CREATE INDEX idx_documents_embedding_hnsw 
+--      ON documents USING hnsw (embedding vector_cosine_ops) 
+--      WITH (m = 16, ef_construction = 64);
+--    
+--    HNSW parameters:
+--    - m: Number of connections per layer (8-64, default: 16)
+--    - ef_construction: Size of dynamic candidate list (10-200, default: 64)
+--    - Higher values = better recall but slower build
+--
+-- 4. Query Performance Tips:
+--    - Keep embedding dimensions consistent (384 for all-MiniLM-L6-v2)
+--    - Use approximate search for datasets > 10K documents
+--    - Add WHERE filters before vector search when possible
+--    - Monitor query performance with EXPLAIN ANALYZE
+--
+-- 5. Database Configuration (postgresql.conf):
+--    shared_buffers = 256MB        # 25% of RAM for cache
+--    effective_cache_size = 1GB    # 50-75% of RAM
+--    maintenance_work_mem = 128MB  # For index creation
+--    work_mem = 64MB              # Per query operation
+--
+-- 6. Monitoring Index Usage:
+--    SELECT schemaname, tablename, indexname, idx_scan, idx_tup_read
+--    FROM pg_stat_user_indexes
+--    WHERE tablename = 'documents';
+--
+-- 7. Rebuild Index (after significant data changes):
+--    REINDEX INDEX idx_documents_embedding;
+--
+-- ===================================================================
