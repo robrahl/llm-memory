@@ -1,53 +1,62 @@
 # llm-memory
 
-Local developer AI agent with persistent memory and Copilot integration.
+Local developer AI agent with persistent memory and GitHub Copilot integration.
 
-## Quick Start - V0 Integration
+## 🚀 Quick Start
 
-**New to llm-memory Copilot integration?** Start here:
-- 📖 **[V0 Quick Start Guide](docs/V0_QUICK_START.md)** — Get up and running in 5 minutes
+Choose your setup path:
 
-## Docs
-- Primary docs folder: `docs/`
-  - `docs/V0_QUICK_START.md` — 5-minute setup guide for V0 (START HERE!)
-  - `docs/copilot-v0-integration.md` — Detailed V0 integration guide
-  - `docs/COPILOT_INTEGRATION.md` — Copilot V0/V1 integration summary
-  - `docs/copilot-v1-mcp.md` — V1 MCP integration
-  - `docs/copilot-v2-mcp.md` — V2.0 MCP integration (advanced tools)
-  - `docs/prd.md` — Project Design Review
-  - `docs/architecture.md` — Architecture specification
-  - `docs/COPILOT_QUICK_REF.md` — Quick prompts for Copilot
+- **[Local Development](docs/deployment/local/README.md)** - Run on your machine (5 minutes)
+- **[Synology NAS](docs/deployment/nas/README.md)** - Deploy for always-on access
 
-## Archive
-- `archive/` contains old/archived docs or test artifacts that are kept for history
-  - `archive/COPILOT_TESTING.md`, `archive/COPILOT_START_HERE.md`
+**First time here?** → [Getting Started Guide](docs/getting-started/README.md)
 
-## Test area
-- `dist_test/` holds isolated test documentation and examples for Copilot testing
+## 📚 Documentation
 
-## Git Remotes — Parallel Push
+### Getting Started
+- **[Getting Started](docs/getting-started/README.md)** - Overview and setup paths
 
-This repository is configured to push to **two remotes in parallel**:
-- **GitHub** (primary): `https://github.com/robrahl/llm-memory.git`
-- **NAS Backup** (mirror): `ssh://robertorahl@rahlnas3:/volume1/git/llm-memory.git`
+### Deployment
+- **[Local Setup](docs/deployment/local/README.md)** - Docker Desktop on Windows/Mac/Linux
+- **[NAS Deployment](docs/deployment/nas/README.md)** - Synology DSM 7.2+ setup
+- **[Git Setup on NAS](docs/deployment/nas/git-setup.md)** - Configure NAS as Git remote
 
-### Push Commands
-```powershell
-# Push to both remotes (parallel)
-git push origin main
+### Copilot Integration
+- **[Copilot Overview](docs/copilot/README.md)** - Integration options (V0/V1/V2)
+- **[V0 Quick Start](docs/copilot/v0-quick-start.md)** - Manual script integration (ready now)
+- **[Quick Reference](docs/copilot/quick-reference.md)** - Commands and prompts cheat sheet
 
-# Push to GitHub only
-git push github main
+### Reference
+- **[Architecture](docs/reference/architecture.md)** - Technical architecture
+- **[PRD](docs/reference/prd.md)** - Product requirements document
+- **[UI Development](docs/reference/ui-development.md)** - Web UI development guide
 
-# Push to NAS backup only
-git push backup main
+## What is llm-memory?
 
-# Push all branches and tags to both
-git push origin --all --tags
-```
+llm-memory is a persistent memory service for LLMs that:
+- 🧠 Stores architectural policies and team knowledge
+- 🔍 Provides semantic search using pgvector
+- 🤖 Integrates with GitHub Copilot for context-aware coding
+- 🐳 Deploys easily via Docker (local or NAS)
+- 🎨 Includes a modern Web UI for policy management
 
-Both remotes stay in sync automatically with each push.
+## Features
+
+- **Persistent Memory**: Store coding standards, patterns, and decisions in PostgreSQL
+- **Semantic Search**: Find relevant policies using natural language queries
+- **Copilot Integration**: Get context-aware suggestions based on your team's knowledge
+- **Vector Embeddings**: Powered by pgvector for similarity search
+- **Web Interface**: Modern UI for managing policies and viewing history
+- **Flexible Deployment**: Run locally or on Synology NAS
+
+## Contributing
+
+Contributions welcome! Please read the [Architecture Guide](docs/reference/architecture.md) first.
+
+## License
+
+See LICENSE file for details.
 
 ---
 
-For detailed usage of the Copilot integration, see `docs/COPILOT_INTEGRATION.md`.
+**Need help?** Check the [Quick Reference](docs/copilot/quick-reference.md) or [Troubleshooting Guide](docs/deployment/local/README.md#troubleshooting).
