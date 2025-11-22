@@ -22,6 +22,23 @@ export interface QueryResult {
   latency_ms: number;
 }
 
+export interface SearchResult {
+  id: string;
+  doc_key: string;
+  content: string;
+  metadata: any;
+  similarity: number | null;
+  source: 'semantic' | 'text';
+}
+
+export interface SearchResponse {
+  query: string;
+  results: SearchResult[];
+  count: number;
+  search_type: string;
+  latency_ms: number;
+}
+
 export const useAppStore = defineStore('app', () => {
   const health = ref<HealthStatus | null>(null);
   const policies = ref<Policy[]>([]);
@@ -85,6 +102,25 @@ export const useAppStore = defineStore('app', () => {
     }
   }
 
+  async function searchDocuments(query: string, topK = 5, useSemanticSearch = true): Promise<SearchResponse | null> {
+    loading.value = true;
+    try {
+      const response = await axios.post<SearchResponse>('/search', { 
+        query, 
+        topK, 
+        useSemanticSearch 
+      });
+      error.value = null;
+      return response.data;
+    } catch (err: any) {
+      error.value = err.message || 'Failed to search documents';
+      console.error('Search failed:', err);
+      return null;
+    } finally {
+      loading.value = false;
+    }
+  }
+
   function initTheme() {
     const savedTheme = localStorage.getItem('theme') as 'light' | 'dark' | null;
     theme.value = savedTheme || 'dark';
@@ -116,6 +152,7 @@ export const useAppStore = defineStore('app', () => {
     fetchPolicies,
     createPolicy,
     queryAgent,
+    searchDocuments,
     initTheme,
     toggleTheme,
   };
