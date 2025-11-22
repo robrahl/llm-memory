@@ -162,10 +162,13 @@ async function runTests() {
   }
 }
 
-// Run tests
-runTests().catch((err) => {
-  console.error('Test execution failed:', err);
-  process.exit(1);
-});
+// Run tests only if this file is executed directly (not imported)
+// Check if this module is the entry point
+if (process.argv[1] && import.meta.url === `file://${process.argv[1]}`) {
+  runTests().catch((err) => {
+    console.error('Test execution failed:', err);
+    process.exit(1);
+  });
+}
 
 export { runTests, testDatabaseConnection, testDocumentsTableExists, testVectorExtension };

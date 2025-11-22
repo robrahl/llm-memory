@@ -13,7 +13,7 @@
 
 import fs from 'fs';
 import path from 'path';
-import { indexDocuments, testConnection, type DocumentInput, type IndexerStats } from './indexer.js';
+import { indexDocuments, testConnection, type DocumentInput, type IndexerStats } from './indexer';
 
 interface CliOptions {
   batchSize: number;

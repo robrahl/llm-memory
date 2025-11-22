@@ -51,6 +51,8 @@ const DEFAULT_OPTIONS: Required<IndexerOptions> = {
   onProgress: () => {},
 };
 
+const RETRY_BASE_DELAY_MS = 1000;
+
 /**
  * Get embedding for text from LLM provider
  */
@@ -80,7 +82,7 @@ async function getEmbedding(text: string, retries = 0, maxRetries = 3): Promise<
     console.error(`Embedding generation failed (attempt ${retries + 1}/${maxRetries}):`, err.message);
     
     if (retries < maxRetries) {
-      const delay = Math.pow(2, retries) * 1000; // Exponential backoff
+      const delay = Math.pow(2, retries) * RETRY_BASE_DELAY_MS; // Exponential backoff
       await new Promise(resolve => setTimeout(resolve, delay));
       return getEmbedding(text, retries + 1, maxRetries);
     }

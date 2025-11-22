@@ -115,13 +115,13 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue';
-import { useAppStore } from '../stores/app';
+import { useAppStore, type SearchResponse } from '../stores/app';
 
 const store = useAppStore();
 const searchQuery = ref('');
 const topK = ref(5);
 const useSemanticSearch = ref(true);
-const result = ref<any | null>(null);
+const result = ref<SearchResponse | null>(null);
 const error = ref<string | null>(null);
 
 const loading = computed(() => store.loading);
