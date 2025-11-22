@@ -162,12 +162,10 @@ async function runTests() {
   }
 }
 
-// Run tests if this file is executed directly
-if (require.main === module) {
-  runTests().catch((err) => {
-    console.error('Test execution failed:', err);
-    process.exit(1);
-  });
-}
+// Run tests
+runTests().catch((err) => {
+  console.error('Test execution failed:', err);
+  process.exit(1);
+});
 
 export { runTests, testDatabaseConnection, testDocumentsTableExists, testVectorExtension };

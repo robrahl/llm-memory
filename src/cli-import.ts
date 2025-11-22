@@ -258,8 +258,6 @@ async function main() {
 }
 
 // Run main if executed directly
-if (require.main === module) {
-  main();
-}
+main();
 
 export { main, discoverMarkdownFiles, parseMarkdownFile };
