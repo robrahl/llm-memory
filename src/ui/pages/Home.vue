@@ -26,6 +26,9 @@
   <template v-else-if="activeTab === 'query'">
     <QueryTester />
   </template>
+  <template v-else-if="activeTab === 'search'">
+    <SearchTester />
+  </template>
   <template v-else-if="activeTab === 'add'">
     <PolicyForm />
   </template>
@@ -36,6 +39,7 @@ import { ref } from 'vue';
 import Dashboard from '../components/Dashboard.vue';
 import PolicyBrowser from '../components/PolicyBrowser.vue';
 import QueryTester from '../components/QueryTester.vue';
+import SearchTester from '../components/SearchTester.vue';
 import PolicyForm from '../components/PolicyForm.vue';
 
 const activeTab = ref('dashboard');
@@ -44,6 +48,7 @@ const tabs = [
   { id: 'dashboard', name: 'Dashboard', icon: '📊' },
   { id: 'policies', name: 'Policy Browser', icon: '📚' },
   { id: 'query', name: 'Query Tester', icon: '🔍' },
+  { id: 'search', name: 'Search Tester', icon: '🔎' },
   { id: 'add', name: 'Add Policy', icon: '➕' },
 ];
 </script>

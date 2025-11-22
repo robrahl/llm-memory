@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS architectural_policies (
 -- Create documents table (for KB)
 CREATE TABLE IF NOT EXISTS documents (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  doc_key TEXT,
+  doc_key TEXT UNIQUE,
   content TEXT,
   metadata JSONB,
   embedding VECTOR(384), -- all-MiniLM-L6-v2 is 384-dim
