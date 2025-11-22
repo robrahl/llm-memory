@@ -13,6 +13,8 @@
     "build:mcp": "tsc src/mcp-server.ts --outDir dist --declaration",
     "dev:mcp": "tsx src/mcp-server.ts",
     "test": "jest",
+    "test:integration": "tsx scripts/test-search-integration.ts",
+    "test:api": "./scripts/test-api-endpoints.sh",
     "lint": "eslint src/",
     "format": "prettier --write src/",
     "start": "node dist/agent.js"
