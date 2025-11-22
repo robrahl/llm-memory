@@ -179,8 +179,9 @@ async function callLLM(prompt: string, systemPrompt?: string): Promise<string> {
       { timeout: 15000 }
     );
 
-    if (llmResp.data?.choices?.[0]?.message?.content) {
-      return llmResp.data.choices[0].message.content.trim();
+    const content = llmResp.data?.choices?.[0]?.message?.content;
+    if (content && typeof content === 'string') {
+      return content.trim();
     }
     throw new Error('No response from LLM');
   } catch (err: any) {
@@ -417,13 +418,24 @@ app.post('/refactor/suggest', async (req: Request, res: Response) => {
     return res.status(400).json({ error: 'code_snippet (string) required' });
   }
   
+  // Limit input length to prevent abuse
+  if (code_snippet.length > 10000) {
+    return res.status(400).json({ error: 'code_snippet too long (max 10000 characters)' });
+  }
+  
   try {
     const startTime = Date.now();
     
+    // Sanitize inputs
+    const sanitizedContext = String(context).slice(0, 100);
+    const sanitizedFocusAreas = Array.isArray(focus_areas) 
+      ? focus_areas.slice(0, 10).map(a => String(a).slice(0, 50)) 
+      : ['all'];
+    
     // Query LLM for refactoring suggestions
     const prompt = `Analyze this code and provide refactoring suggestions.
-Context: ${context}
-Focus areas: ${focus_areas.join(', ')}
+Context: ${sanitizedContext}
+Focus areas: ${sanitizedFocusAreas.join(', ')}
 
 Code:
 ${code_snippet}
@@ -492,76 +504,102 @@ app.post('/adr/generate', async (req: Request, res: Response) => {
     return res.status(400).json({ error: 'decision (string) required' });
   }
   
+  // Validate and sanitize inputs
+  if (title.length > 200 || context.length > 5000 || decision.length > 5000) {
+    return res.status(400).json({ error: 'Input too long' });
+  }
+  
+  const validStatuses = ['proposed', 'accepted', 'deprecated', 'superseded'];
+  if (!validStatuses.includes(status)) {
+    return res.status(400).json({ error: 'Invalid status' });
+  }
+  
   try {
-    // Get next ADR number by counting existing ADRs in database
-    const countResult = await pool.query(
-      `SELECT COUNT(*) as count FROM documents WHERE doc_key LIKE 'adr-%'`
-    );
-    const nextNumber = parseInt(countResult.rows[0].count) + 1;
-    const adrNumber = String(nextNumber).padStart(4, '0');
-    
-    const date = new Date().toISOString().split('T')[0];
-    const adrKey = `adr-${adrNumber}`;
-    
-    // Generate ADR content
-    const adrContent = `# ADR-${adrNumber}: ${title}
+    // Use database transaction for atomic ADR numbering
+    const client = await pool.connect();
+    try {
+      await client.query('BEGIN');
+      
+      // Get next ADR number atomically
+      const countResult = await client.query(
+        `SELECT COUNT(*) as count FROM documents WHERE doc_key LIKE 'adr-%' FOR UPDATE`
+      );
+      const nextNumber = parseInt(countResult.rows[0].count) + 1;
+      const adrNumber = String(nextNumber).padStart(4, '0');
+      
+      const date = new Date().toISOString().split('T')[0];
+      const adrKey = `adr-${adrNumber}`;
+      
+      // Sanitize text inputs (escape special characters for markdown safety)
+      const sanitizeText = (text: string) => text.replace(/[<>]/g, '');
+      
+      // Generate ADR content
+      const adrContent = `# ADR-${adrNumber}: ${sanitizeText(title)}
 
 **Status:** ${status}
 **Date:** ${date}
 
 ## Context
 
-${context}
+${sanitizeText(context)}
 
 ## Decision
 
-${decision}
+${sanitizeText(decision)}
 
 ${consequences ? `## Consequences
 
-${consequences}` : ''}
+${sanitizeText(consequences)}` : ''}
 
 ${alternatives ? `## Alternatives Considered
 
-${alternatives}` : ''}
+${sanitizeText(alternatives)}` : ''}
 
 ## References
 
 - Generated: ${new Date().toISOString()}
 `;
 
-    // Store ADR in database
-    await pool.query(
-      `INSERT INTO documents (doc_key, content, metadata)
-       VALUES ($1, $2, $3)
-       ON CONFLICT (doc_key) DO UPDATE SET content = EXCLUDED.content, metadata = EXCLUDED.metadata`,
-      [
-        adrKey,
-        adrContent,
-        JSON.stringify({
-          type: 'adr',
-          number: adrNumber,
-          title,
-          status,
-          date
-        })
-      ]
-    );
-    
-    res.json({
-      success: true,
-      number: adrNumber,
-      title,
-      status,
-      date,
-      file_path: `docs/adr/${adrKey}.md`,
-      content: adrContent,
-      next_steps: [
-        'Review with team',
-        `Update status to 'accepted' after approval`,
-        `Document is stored in knowledge base with key: ${adrKey}`
-      ]
-    });
+      // Store ADR in database
+      await client.query(
+        `INSERT INTO documents (doc_key, content, metadata)
+         VALUES ($1, $2, $3)
+         ON CONFLICT (doc_key) DO UPDATE SET content = EXCLUDED.content, metadata = EXCLUDED.metadata`,
+        [
+          adrKey,
+          adrContent,
+          JSON.stringify({
+            type: 'adr',
+            number: adrNumber,
+            title: sanitizeText(title),
+            status,
+            date
+          })
+        ]
+      );
+      
+      await client.query('COMMIT');
+      
+      res.json({
+        success: true,
+        number: adrNumber,
+        title: sanitizeText(title),
+        status,
+        date,
+        file_path: `docs/adr/${adrKey}.md`,
+        content: adrContent,
+        next_steps: [
+          'Review with team',
+          `Update status to 'accepted' after approval`,
+          `Document is stored in knowledge base with key: ${adrKey}`
+        ]
+      });
+    } catch (err) {
+      await client.query('ROLLBACK');
+      throw err;
+    } finally {
+      client.release();
+    }
   } catch (err: any) {
     console.error('ADR generation error:', err.message);
     return res.status(500).json({ error: 'adr_error', message: err?.message });

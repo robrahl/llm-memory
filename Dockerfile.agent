@@ -10,8 +10,10 @@ RUN npm install --no-audit --no-fund
 
 # Copy source and config
 COPY src ./src
+COPY ui ./ui
 COPY tsconfig.json ./
 COPY vite.config.ts ./
+COPY tailwind.config.ts ./
 COPY healthcheck.js ./
 
 # Build TypeScript and UI
