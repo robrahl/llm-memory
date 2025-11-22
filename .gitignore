@@ -76,4 +76,8 @@ __pycache__/
 # Ignore generated docs or bundles
 docs/_site/
 
+# Build artifacts
+*.tar
+.playwright-mcp/
+
 # End of .gitignore

@@ -36,35 +36,35 @@ app.get('/health', async (_req: Request, res: Response) => {
     status.db_error = err?.message;
   }
 
-  // Check LLM provider health
-  try {
-    let healthy = false;
-    if (LLM_PROVIDER === 'openai' || LLM_PROVIDER === 'lmstudio') {
-      const resp = await axios.get(`${LLM_BASE_URL}/v1/models`, { timeout: 1500 });
-      healthy = resp.status === 200;
-    } else if (LLM_PROVIDER === 'ollama') {
-      const resp = await axios.get(`${LLM_BASE_URL}/api/tags`, { timeout: 1500 });
-      healthy = resp.status === 200;
-    } else {
-      // Try OpenAI then Ollama
-      try {
-        const r1 = await axios.get(`${LLM_BASE_URL}/v1/models`, { timeout: 1000 });
-        healthy = r1.status === 200;
-      } catch {
-        const r2 = await axios.get(`${LLM_BASE_URL}/api/tags`, { timeout: 1000 });
-        healthy = r2.status === 200;
+    // Check LLM provider health
+    try {
+      let healthy = false;
+      if (LLM_PROVIDER === 'openai' || LLM_PROVIDER === 'lmstudio') {
+        const resp = await axios.get(`${LLM_BASE_URL}/v1/models`, { timeout: 5000 });
+        healthy = resp.status === 200;
+      } else if (LLM_PROVIDER === 'ollama') {
+        const resp = await axios.get(`${LLM_BASE_URL}/api/tags`, { timeout: 5000 });
+        healthy = resp.status === 200;
+      } else {
+        // Try OpenAI then Ollama
+        try {
+          const r1 = await axios.get(`${LLM_BASE_URL}/v1/models`, { timeout: 5000 });
+          healthy = r1.status === 200;
+        } catch {
+          const r2 = await axios.get(`${LLM_BASE_URL}/api/tags`, { timeout: 5000 });
+          healthy = r2.status === 200;
+        }
       }
-    }
-    status.ollama = healthy ? 'reachable' : 'unreachable';
-    if (!healthy) {
+      status.ollama = healthy ? 'reachable' : 'unreachable';
+      if (!healthy) {
+        status.status = status.postgres === 'connected' ? 'degraded' : 'degraded';
+      }
+    } catch (err: any) {
+      console.error('Healthcheck LLM Error:', err.message);
+      status.ollama = 'unreachable';
       status.status = status.postgres === 'connected' ? 'degraded' : 'degraded';
-    }
-  } catch {
-    status.ollama = 'unreachable';
-    status.status = status.postgres === 'connected' ? 'degraded' : 'degraded';
-  }
-
-  res.json(status);
+      status.llm_error = err.message;
+    }  res.json(status);
 });
 
 app.post('/policy', async (req: Request, res: Response) => {
