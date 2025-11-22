@@ -1,7 +1,6 @@
-# llm-memory  pdr
+# llm-memory PRD
 
-
-**PDR — Preliminary Design Review**
+**PRD — Product Requirements Document**
 
 Zweck: Dokumentiert das vorläufige Design, Ziele, Annahmen und die Abnahmekriterien für die Implementierung eines Developer‑AI‑Systems mit persistentem Memory (Postgres + pgvector) und TypeScript‑Agenten, lokal betrieben auf Synology DSM7 via Docker.
 
