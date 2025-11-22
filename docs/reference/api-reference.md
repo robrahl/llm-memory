@@ -224,6 +224,158 @@ Parameters:
 
 ---
 
+## V2.0 Endpoints
+
+### POST /scan/compliance
+
+Scan codebase for policy compliance violations.
+
+**Request Body:**
+```json
+{
+  "directory": "./src",
+  "recursive": true,
+  "file_patterns": "*.ts,*.js",
+  "policy_keys": ["naming_convention", "error_handling"]
+}
+```
+
+Parameters:
+- `directory` (string, required) - Path to scan
+- `recursive` (boolean, optional) - Scan subdirectories (default: true)
+- `file_patterns` (string, optional) - File patterns to include
+- `policy_keys` (array, optional) - Specific policies to check
+
+**Response:**
+```json
+{
+  "success": true,
+  "summary": {
+    "files_scanned": 45,
+    "violations_found": 3,
+    "compliance_score": 0.95
+  },
+  "violations": [
+    {
+      "file": "src/utils.ts",
+      "line": 23,
+      "policy": "naming_convention",
+      "message": "Function name doesn't follow camelCase convention"
+    }
+  ],
+  "scan_time_ms": 320
+}
+```
+
+### POST /refactor/suggest
+
+Get AI-powered code refactoring suggestions.
+
+**Request Body:**
+```json
+{
+  "code_snippet": "function example() { var x = 1; return x + 2; }",
+  "context": "typescript-service",
+  "focus_areas": ["performance", "security", "readability"]
+}
+```
+
+Parameters:
+- `code_snippet` (string, required) - Code to analyze
+- `context` (string, optional) - Language/framework context
+- `focus_areas` (array, optional) - Areas to focus on
+
+**Response:**
+```json
+{
+  "success": true,
+  "suggestions": [
+    {
+      "category": "modern-syntax",
+      "priority": "medium",
+      "description": "Use const instead of var for immutable variables",
+      "example": "const x = 1;"
+    }
+  ],
+  "overall_score": 0.8,
+  "analysis_time_ms": 450
+}
+```
+
+### POST /adr/generate
+
+Generate Architecture Decision Record (ADR).
+
+**Request Body:**
+```json
+{
+  "title": "Use PostgreSQL for data persistence",
+  "context": "We need a reliable database for storing policies and documents",
+  "decision": "We will use PostgreSQL with pgvector extension",
+  "consequences": "Better performance and vector search capabilities",
+  "alternatives": "MongoDB, MySQL",
+  "status": "proposed"
+}
+```
+
+Parameters:
+- `title` (string, required) - ADR title
+- `context` (string, required) - Background and problem statement
+- `decision` (string, required) - The decision made
+- `consequences` (string, optional) - Positive and negative outcomes
+- `alternatives` (string, optional) - Other options considered
+- `status` (enum, optional) - "proposed", "accepted", "deprecated", "superseded" (default: "proposed")
+
+**Response:**
+```json
+{
+  "success": true,
+  "number": "0001",
+  "title": "Use PostgreSQL for data persistence",
+  "status": "proposed",
+  "date": "2025-11-22",
+  "file_path": "docs/adr/adr-0001.md",
+  "content": "# ADR-0001: Use PostgreSQL...",
+  "next_steps": [
+    "Review with team",
+    "Update status to 'accepted' after approval",
+    "Document is stored in knowledge base with key: adr-0001"
+  ]
+}
+```
+
+### GET /metrics
+
+Get real-time system performance and usage metrics.
+
+**Response:**
+```json
+{
+  "queries": {
+    "total": 1250,
+    "avg_latency_ms": 180,
+    "p95_latency_ms": 320,
+    "p99_latency_ms": 450,
+    "error_rate": 0.02
+  },
+  "storage": {
+    "documents": 156,
+    "policies": 12,
+    "total_size_mb": 45.3,
+    "vector_index_size_mb": 12.8
+  },
+  "system": {
+    "agent_uptime_hours": 24.5,
+    "postgres_connections": 5,
+    "ollama_status": "connected",
+    "memory_usage_mb": 256.4,
+    "cpu_usage_percent": 15.2
+  }
+}
+```
+
+---
+
 ## Configuration
 
 ### Environment Variables

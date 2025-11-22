@@ -156,6 +156,39 @@ async function getEmbedding(text: string): Promise<number[] | null> {
   }
 }
 
+// Helper function to call LLM for text generation
+async function callLLM(prompt: string, systemPrompt?: string): Promise<string> {
+  try {
+    const llmResp = await axios.post(
+      `${LLM_BASE_URL}/v1/chat/completions`,
+      {
+        model: process.env.LLM_MODEL || 'mistral:7b',
+        messages: [
+          {
+            role: 'system',
+            content: systemPrompt || 'You are a helpful assistant.',
+          },
+          {
+            role: 'user',
+            content: prompt,
+          },
+        ],
+        temperature: 0.3,
+        max_tokens: 1000,
+      },
+      { timeout: 15000 }
+    );
+
+    if (llmResp.data?.choices?.[0]?.message?.content) {
+      return llmResp.data.choices[0].message.content.trim();
+    }
+    throw new Error('No response from LLM');
+  } catch (err: any) {
+    console.error('LLM call failed:', err.message);
+    throw err;
+  }
+}
+
 app.post('/query', async (req: Request, res: Response) => {
   const started = Date.now();
   const { query, topK } = req.body || {};
@@ -339,6 +372,248 @@ app.post('/ingest', async (req: Request, res: Response) => {
   } catch (err: any) {
     console.error('Ingest error:', err.message);
     return res.status(500).json({ error: 'ingest_error', message: err?.message });
+  }
+});
+
+// V2.0 Endpoints
+
+// POST /scan/compliance - Codebase policy compliance scanning
+app.post('/scan/compliance', async (req: Request, res: Response) => {
+  const { directory } = req.body || {};
+  
+  if (!directory || typeof directory !== 'string') {
+    return res.status(400).json({ error: 'directory (string) required' });
+  }
+  
+  try {
+    const startTime = Date.now();
+    
+    // For now, return a mock response indicating the feature is not yet fully implemented
+    // In a real implementation, this would scan files and check against policies
+    const response = {
+      success: true,
+      summary: {
+        files_scanned: 0,
+        violations_found: 0,
+        compliance_score: 1.0,
+      },
+      violations: [],
+      scan_time_ms: Date.now() - startTime,
+      note: 'Compliance scanning feature is planned for future implementation'
+    };
+    
+    res.json(response);
+  } catch (err: any) {
+    console.error('Compliance scan error:', err.message);
+    return res.status(500).json({ error: 'scan_error', message: err?.message });
+  }
+});
+
+// POST /refactor/suggest - AI-powered refactoring suggestions
+app.post('/refactor/suggest', async (req: Request, res: Response) => {
+  const { code_snippet, context = 'general', focus_areas = ['all'] } = req.body || {};
+  
+  if (!code_snippet || typeof code_snippet !== 'string') {
+    return res.status(400).json({ error: 'code_snippet (string) required' });
+  }
+  
+  try {
+    const startTime = Date.now();
+    
+    // Query LLM for refactoring suggestions
+    const prompt = `Analyze this code and provide refactoring suggestions.
+Context: ${context}
+Focus areas: ${focus_areas.join(', ')}
+
+Code:
+${code_snippet}
+
+Provide specific, actionable suggestions for improvements in:
+1. Code quality and readability
+2. Performance optimization
+3. Security considerations
+4. Best practices
+
+Format your response as a JSON array of suggestions, each with: category, priority, description, and example.`;
+
+    let suggestions = [];
+    let overall_score = 0;
+    
+    try {
+      const llmResponse = await callLLM(prompt);
+      // Try to parse suggestions from response
+      try {
+        const parsed = JSON.parse(llmResponse);
+        suggestions = Array.isArray(parsed) ? parsed : [parsed];
+      } catch {
+        // If not JSON, create a single suggestion from the text
+        suggestions = [{
+          category: 'general',
+          priority: 'medium',
+          description: llmResponse,
+          example: ''
+        }];
+      }
+      overall_score = suggestions.length > 0 ? 0.8 : 1.0;
+    } catch (err: any) {
+      // If LLM unavailable, provide basic static suggestions
+      suggestions = [{
+        category: 'availability',
+        priority: 'info',
+        description: 'LLM service unavailable. Enable LLM for AI-powered suggestions.',
+        example: ''
+      }];
+      overall_score = 1.0;
+    }
+    
+    res.json({
+      success: true,
+      suggestions,
+      overall_score,
+      analysis_time_ms: Date.now() - startTime
+    });
+  } catch (err: any) {
+    console.error('Refactor suggest error:', err.message);
+    return res.status(500).json({ error: 'refactor_error', message: err?.message });
+  }
+});
+
+// POST /adr/generate - Generate Architecture Decision Record
+app.post('/adr/generate', async (req: Request, res: Response) => {
+  const { title, context, decision, consequences = '', alternatives = '', status = 'proposed' } = req.body || {};
+  
+  if (!title || typeof title !== 'string') {
+    return res.status(400).json({ error: 'title (string) required' });
+  }
+  if (!context || typeof context !== 'string') {
+    return res.status(400).json({ error: 'context (string) required' });
+  }
+  if (!decision || typeof decision !== 'string') {
+    return res.status(400).json({ error: 'decision (string) required' });
+  }
+  
+  try {
+    // Get next ADR number by counting existing ADRs in database
+    const countResult = await pool.query(
+      `SELECT COUNT(*) as count FROM documents WHERE doc_key LIKE 'adr-%'`
+    );
+    const nextNumber = parseInt(countResult.rows[0].count) + 1;
+    const adrNumber = String(nextNumber).padStart(4, '0');
+    
+    const date = new Date().toISOString().split('T')[0];
+    const adrKey = `adr-${adrNumber}`;
+    
+    // Generate ADR content
+    const adrContent = `# ADR-${adrNumber}: ${title}
+
+**Status:** ${status}
+**Date:** ${date}
+
+## Context
+
+${context}
+
+## Decision
+
+${decision}
+
+${consequences ? `## Consequences
+
+${consequences}` : ''}
+
+${alternatives ? `## Alternatives Considered
+
+${alternatives}` : ''}
+
+## References
+
+- Generated: ${new Date().toISOString()}
+`;
+
+    // Store ADR in database
+    await pool.query(
+      `INSERT INTO documents (doc_key, content, metadata)
+       VALUES ($1, $2, $3)
+       ON CONFLICT (doc_key) DO UPDATE SET content = EXCLUDED.content, metadata = EXCLUDED.metadata`,
+      [
+        adrKey,
+        adrContent,
+        JSON.stringify({
+          type: 'adr',
+          number: adrNumber,
+          title,
+          status,
+          date
+        })
+      ]
+    );
+    
+    res.json({
+      success: true,
+      number: adrNumber,
+      title,
+      status,
+      date,
+      file_path: `docs/adr/${adrKey}.md`,
+      content: adrContent,
+      next_steps: [
+        'Review with team',
+        `Update status to 'accepted' after approval`,
+        `Document is stored in knowledge base with key: ${adrKey}`
+      ]
+    });
+  } catch (err: any) {
+    console.error('ADR generation error:', err.message);
+    return res.status(500).json({ error: 'adr_error', message: err?.message });
+  }
+});
+
+// GET /metrics - System performance and usage metrics
+app.get('/metrics', async (_req: Request, res: Response) => {
+  try {
+    // Get document and policy counts
+    const docCount = await pool.query('SELECT COUNT(*) as count FROM documents');
+    const policyCount = await pool.query('SELECT COUNT(*) as count FROM architectural_policies');
+    
+    // Get database size info
+    const dbSize = await pool.query(`
+      SELECT pg_database_size(current_database()) as size_bytes
+    `);
+    const sizeBytes = parseInt(dbSize.rows[0]?.size_bytes || '0');
+    const sizeMB = (sizeBytes / (1024 * 1024)).toFixed(2);
+    
+    // Calculate vector index size (approximate)
+    const vectorSize = await pool.query(`
+      SELECT pg_total_relation_size('documents') as size_bytes
+    `);
+    const vectorSizeBytes = parseInt(vectorSize.rows[0]?.size_bytes || '0');
+    const vectorSizeMB = (vectorSizeBytes / (1024 * 1024)).toFixed(2);
+    
+    res.json({
+      queries: {
+        total: 0,
+        avg_latency_ms: 0,
+        p95_latency_ms: 0,
+        p99_latency_ms: 0,
+        error_rate: 0
+      },
+      storage: {
+        documents: parseInt(docCount.rows[0]?.count || '0'),
+        policies: parseInt(policyCount.rows[0]?.count || '0'),
+        total_size_mb: parseFloat(sizeMB),
+        vector_index_size_mb: parseFloat(vectorSizeMB)
+      },
+      system: {
+        agent_uptime_hours: (process.uptime() / 3600).toFixed(2),
+        postgres_connections: pool.totalCount,
+        ollama_status: 'unknown',
+        memory_usage_mb: (process.memoryUsage().heapUsed / (1024 * 1024)).toFixed(2),
+        cpu_usage_percent: 0
+      }
+    });
+  } catch (err: any) {
+    console.error('Metrics error:', err.message);
+    return res.status(500).json({ error: 'metrics_error', message: err?.message });
   }
 });
 

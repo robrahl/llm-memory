@@ -119,8 +119,89 @@ else
 fi
 echo ""
 
+# Test 7: V2 Metrics endpoint
+echo -e "${YELLOW}Test 7: Metrics endpoint (V2)${NC}"
+response=$(curl -s -w "\nHTTP_CODE:%{http_code}" "$BASE_URL/metrics")
+http_code=$(echo "$response" | grep "HTTP_CODE" | cut -d: -f2)
+body=$(echo "$response" | sed '/HTTP_CODE/d')
+
+if [ "$http_code" == "200" ]; then
+    echo -e "${GREEN}✓ Metrics endpoint works${NC}"
+    echo "$body" | jq '.storage, .system' 2>/dev/null || echo "$body"
+else
+    echo -e "${RED}✗ Metrics endpoint failed (HTTP $http_code)${NC}"
+    echo "$body"
+fi
+echo ""
+
+# Test 8: V2 ADR generation
+echo -e "${YELLOW}Test 8: ADR Generation endpoint (V2)${NC}"
+response=$(curl -s -w "\nHTTP_CODE:%{http_code}" -X POST "$BASE_URL/adr/generate" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "title": "Test ADR",
+    "context": "We need to test ADR generation functionality",
+    "decision": "Create a test ADR through the API",
+    "status": "proposed"
+  }')
+http_code=$(echo "$response" | grep "HTTP_CODE" | cut -d: -f2)
+body=$(echo "$response" | sed '/HTTP_CODE/d')
+
+if [ "$http_code" == "200" ]; then
+    echo -e "${GREEN}✓ ADR generation works${NC}"
+    echo "$body" | jq '.number, .title, .status' 2>/dev/null || echo "$body"
+else
+    echo -e "${RED}✗ ADR generation failed (HTTP $http_code)${NC}"
+    echo "$body"
+fi
+echo ""
+
+# Test 9: V2 Compliance scan
+echo -e "${YELLOW}Test 9: Compliance Scan endpoint (V2)${NC}"
+response=$(curl -s -w "\nHTTP_CODE:%{http_code}" -X POST "$BASE_URL/scan/compliance" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "directory": "./src",
+    "recursive": true
+  }')
+http_code=$(echo "$response" | grep "HTTP_CODE" | cut -d: -f2)
+body=$(echo "$response" | sed '/HTTP_CODE/d')
+
+if [ "$http_code" == "200" ]; then
+    echo -e "${GREEN}✓ Compliance scan endpoint works${NC}"
+    echo "$body" | jq '.summary' 2>/dev/null || echo "$body"
+else
+    echo -e "${RED}✗ Compliance scan failed (HTTP $http_code)${NC}"
+    echo "$body"
+fi
+echo ""
+
+# Test 10: V2 Refactor suggestions
+echo -e "${YELLOW}Test 10: Refactor Suggestions endpoint (V2)${NC}"
+response=$(curl -s -w "\nHTTP_CODE:%{http_code}" -X POST "$BASE_URL/refactor/suggest" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "code_snippet": "function test() { var x = 1; return x + 2; }",
+    "context": "javascript",
+    "focus_areas": ["readability", "modern-syntax"]
+  }')
+http_code=$(echo "$response" | grep "HTTP_CODE" | cut -d: -f2)
+body=$(echo "$response" | sed '/HTTP_CODE/d')
+
+if [ "$http_code" == "200" ]; then
+    echo -e "${GREEN}✓ Refactor suggestions endpoint works${NC}"
+    echo "$body" | jq '.success, .suggestions | length' 2>/dev/null || echo "$body"
+else
+    echo -e "${RED}✗ Refactor suggestions failed (HTTP $http_code)${NC}"
+    echo "$body"
+fi
+echo ""
+
 echo "=== Test Summary ==="
 echo "All endpoint tests completed. Review results above."
+echo ""
+echo "V1 Endpoints: /health, /query, /search, /ingest"
+echo "V2 Endpoints: /metrics, /adr/generate, /scan/compliance, /refactor/suggest"
 echo ""
 echo "Note: Semantic search may fall back to text search if LLM service is unavailable."
 echo "This is expected behavior for offline/degraded mode."
