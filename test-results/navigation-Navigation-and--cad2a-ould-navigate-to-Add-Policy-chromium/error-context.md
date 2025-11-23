@@ -1,0 +1,56 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e3]:
+  - navigation [ref=e4]:
+    - generic [ref=e5]:
+      - link "🧠 llm-memory" [ref=e6] [cursor=pointer]:
+        - /url: /ui/dashboard
+        - generic [ref=e7]: 🧠
+        - generic [ref=e8]: llm-memory
+      - list [ref=e10]:
+        - listitem [ref=e11]:
+          - link "📊 Dashboard" [ref=e12] [cursor=pointer]:
+            - /url: /ui/dashboard
+            - generic [ref=e13]: 📊
+            - generic [ref=e14]: Dashboard
+        - listitem [ref=e15]:
+          - link "📚 Policy Browser" [ref=e16] [cursor=pointer]:
+            - /url: /ui/policies
+            - generic [ref=e17]: 📚
+            - generic [ref=e18]: Policy Browser
+        - listitem [ref=e19]:
+          - link "🔍 Query Tester" [ref=e20] [cursor=pointer]:
+            - /url: /ui/query
+            - generic [ref=e21]: 🔍
+            - generic [ref=e22]: Query Tester
+        - listitem [ref=e23]:
+          - link "➕ Add Policy" [active] [ref=e24] [cursor=pointer]:
+            - /url: /ui/add-policy
+            - generic [ref=e25]: ➕
+            - generic [ref=e26]: Add Policy
+        - listitem [ref=e27]:
+          - button "☀️ Light" [ref=e28] [cursor=pointer]:
+            - generic [ref=e29]: ☀️
+            - generic [ref=e30]: Light
+  - main [ref=e31]:
+    - generic [ref=e33]:
+      - heading "➕ Add New Policy" [level=2] [ref=e34]
+      - generic [ref=e37]:
+        - generic [ref=e38]:
+          - generic [ref=e39]: Policy Key *
+          - textbox "e.g., naming-convention" [ref=e40]
+          - text: Use kebab-case
+        - generic [ref=e41]:
+          - generic [ref=e42]: Description
+          - textbox "Brief description of this policy..." [ref=e43]
+        - generic [ref=e44]:
+          - generic [ref=e45]: Policy Value (JSON) *
+          - 'textbox "{\\n \"rule\": \"value\",\\n \"details\": \"...\"\\n}" [ref=e46]':
+            - /placeholder: "{\\n  \"rule\": \"value\",\\n  \"details\": \"...\"\\n}"
+        - generic [ref=e47]:
+          - button "💾 Add Policy" [ref=e48] [cursor=pointer]
+          - button "Clear" [ref=e49] [cursor=pointer]
+  - contentinfo [ref=e50]:
+    - paragraph [ref=e52]: llm-memory v1.1 • Powered by Vue 3 + Bootstrap 5
+```
