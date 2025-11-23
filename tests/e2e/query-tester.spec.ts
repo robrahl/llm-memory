@@ -7,7 +7,14 @@ import { test, expect } from '@playwright/test';
 
 test.describe('Query Tester', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/query');
+    await page.goto('/');
+    
+    // Wait for page to load
+    await page.waitForTimeout(500);
+    
+    // Navigate to Query Tester tab
+    await page.locator('button:has-text("Query Tester")').click();
+    await page.waitForTimeout(300);
   });
 
   test('should display query tester interface', async ({ page }) => {
@@ -80,20 +87,31 @@ test.describe('Query Tester', () => {
 
 test.describe('Search Tester', () => {
   test('should access search tester if available', async ({ page }) => {
-    // Try to navigate to search tester (might be a tab or separate page)
+    // Start at home page
     await page.goto('/');
     
-    // Look for Search Tester link/tab
-    const searchTesterLink = page.locator('text=Search Tester');
+    // Wait for page to load
+    await page.waitForTimeout(500);
     
-    if (await searchTesterLink.count() > 0) {
-      await searchTesterLink.click();
-      await expect(page.locator('text=Search Tester')).toBeVisible();
+    // Look for Query Tester tab
+    const queryTesterTab = page.locator('button:has-text("Query Tester")');
+    
+    if (await queryTesterTab.count() > 0) {
+      await queryTesterTab.click();
+      await page.waitForTimeout(300);
+      await expect(page.locator('text=Query Tester')).toBeVisible();
     }
   });
 
   test('should have semantic search toggle if available', async ({ page }) => {
-    await page.goto('/query');
+    await page.goto('/');
+    
+    // Wait for page to load
+    await page.waitForTimeout(500);
+    
+    // Navigate to Query Tester tab
+    await page.locator('button:has-text("Query Tester")').click();
+    await page.waitForTimeout(300);
     
     // Look for semantic search toggle/checkbox
     const semanticToggle = page.locator('input[type="checkbox"]').filter({

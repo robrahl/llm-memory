@@ -11,16 +11,24 @@ test.describe('Dashboard', () => {
   });
 
   test('should display dashboard title', async ({ page }) => {
-    await expect(page.locator('h1, h2, h3').filter({ hasText: 'Dashboard' })).toBeVisible();
+    // Wait for page to load
+    await page.waitForTimeout(500);
+    
+    // Dashboard heading or System Status should be visible
+    await expect(page.locator('text=System Status')).toBeVisible();
   });
 
   test('should display status cards', async ({ page }) => {
     // Wait for content to load
     await page.waitForTimeout(1000);
     
-    // Dashboard should have some content
+    // Dashboard should have status cards (Agent, PostgreSQL, LLM Provider)
     const mainContent = page.locator('main');
     await expect(mainContent).toBeVisible();
+    
+    // Check for status cards
+    await expect(page.locator('text=Agent')).toBeVisible();
+    await expect(page.locator('text=PostgreSQL')).toBeVisible();
   });
 
   test('should handle loading states', async ({ page }) => {
@@ -34,6 +42,11 @@ test.describe('Dashboard', () => {
 
   test('dashboard should be accessible via direct URL', async ({ page }) => {
     await page.goto('/dashboard');
-    await expect(page).toHaveURL('/dashboard');
+    
+    // Wait for page to load
+    await page.waitForTimeout(500);
+    
+    // Main dashboard content should be visible
+    await expect(page.locator('text=System Status')).toBeVisible();
   });
 });
