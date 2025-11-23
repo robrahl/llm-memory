@@ -9,14 +9,17 @@ test.describe('Navigation and Routing', () => {
   test('should load the homepage', async ({ page }) => {
     await page.goto('/');
     
+    // Wait for page to load
+    await page.waitForTimeout(500);
+    
     // Check if the app loads
     await expect(page).toHaveTitle(/llm-memory/i);
     
     // Check for tabs navigation (not nav.navbar - app uses tabs)
     await expect(page.locator('.tabs.tabs-boxed')).toBeVisible();
     
-    // Check for llm-memory brand
-    await expect(page.locator('text=llm-memory')).toBeVisible();
+    // Check for llm-memory heading
+    await expect(page.locator('h1:has-text("llm-memory")')).toBeVisible();
   });
 
   test('should navigate to Dashboard', async ({ page }) => {
@@ -55,8 +58,9 @@ test.describe('Navigation and Routing', () => {
     // Wait for content
     await page.waitForTimeout(300);
     
-    // Verify Query Tester is visible
-    await expect(page.locator('text=Query Tester')).toBeVisible();
+    // Verify Query Tester tab is active
+    const queryTab = page.locator('button:has-text("Query Tester")');
+    await expect(queryTab).toHaveClass(/tab-active/);
   });
 
   test('should navigate to Add Policy', async ({ page }) => {
@@ -68,8 +72,9 @@ test.describe('Navigation and Routing', () => {
     // Wait for content
     await page.waitForTimeout(300);
     
-    // Verify Add Policy is visible
-    await expect(page.locator('text=Add Policy')).toBeVisible();
+    // Verify Add Policy tab is active
+    const addPolicyTab = page.locator('button.tab:has-text("Add Policy")');
+    await expect(addPolicyTab).toHaveClass(/tab-active/);
   });
 
   test('should have active nav link highlighting', async ({ page }) => {
