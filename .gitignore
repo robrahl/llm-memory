@@ -68,6 +68,10 @@ secrets/
 
 # Ignore local test artifacts
 test-output/
+test-results/
+playwright-report/
+*.webm
+*.mp4
 
 # Ignore compiled Python artifacts (if any)
 __pycache__/
