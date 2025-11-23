@@ -21,7 +21,7 @@ test.describe('API Health and Status', () => {
       }
     } catch (error) {
       // Backend not running is acceptable for UI-only tests
-      console.log('Backend not available - this is OK for UI tests');
+      // No action needed - test passes
     }
   });
 });

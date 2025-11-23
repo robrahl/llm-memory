@@ -73,7 +73,7 @@ test.describe('Navigation and Routing', () => {
     await page.waitForTimeout(300);
     
     // Verify Add Policy tab is active
-    const addPolicyTab = page.locator('button.tab:has-text("Add Policy")');
+    const addPolicyTab = page.locator('button:has-text("Add Policy")');
     await expect(addPolicyTab).toHaveClass(/tab-active/);
   });
 
@@ -101,7 +101,10 @@ test.describe('Navigation and Routing', () => {
 
 test.describe('Theme Switching', () => {
   test('should toggle between dark and light themes', async ({ page }) => {
-    await page.goto('/dashboard');
+    await page.goto('/');
+    
+    // Wait for page to load
+    await page.waitForTimeout(500);
     
     // Note: Theme toggle functionality may not be fully implemented yet
     // This test checks for the presence of the page structure

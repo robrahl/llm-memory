@@ -12,13 +12,13 @@ test.describe('Dashboard', () => {
     // Wait for page to load
     await page.waitForTimeout(500);
     
-    // Dashboard tab should be active by default, but if not, click it
-    const isDashboardActive = await page.locator('button:has-text("Dashboard")').evaluate((el) => {
-      return el.classList.contains('tab-active');
-    });
+    // Dashboard tab should be active by default
+    // If not, click it to navigate there
+    const dashboardTab = page.locator('button:has-text("Dashboard")');
+    const isActive = await dashboardTab.evaluate((el) => el.classList.contains('tab-active'));
     
-    if (!isDashboardActive) {
-      await page.locator('button:has-text("Dashboard")').click();
+    if (!isActive) {
+      await dashboardTab.click();
       await page.waitForTimeout(300);
     }
   });
