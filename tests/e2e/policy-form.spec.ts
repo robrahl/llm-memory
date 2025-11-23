@@ -7,7 +7,14 @@ import { test, expect } from '@playwright/test';
 
 test.describe('Add Policy Form', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/add-policy');
+    await page.goto('/');
+    
+    // Wait for page to load
+    await page.waitForTimeout(500);
+    
+    // Navigate to Add Policy tab
+    await page.locator('button:has-text("Add Policy")').click();
+    await page.waitForTimeout(300);
   });
 
   test('should display add policy form', async ({ page }) => {
@@ -101,20 +108,27 @@ test.describe('Add Policy Form', () => {
 
 test.describe('Policy CRUD Operations', () => {
   test('should maintain form state when navigating away and back', async ({ page }) => {
-    await page.goto('/add-policy');
+    await page.goto('/');
+    
+    // Wait for page to load
+    await page.waitForTimeout(500);
+    
+    // Navigate to Add Policy tab
+    await page.locator('button:has-text("Add Policy")').click();
+    await page.waitForTimeout(300);
     
     // Fill in a field
     const input = page.locator('input[type="text"], textarea').first();
     if (await input.count() > 0) {
       await input.fill('Test Content');
       
-      // Navigate away
-      await page.click('text=Dashboard');
-      await page.waitForURL('/dashboard');
+      // Navigate away to Dashboard tab
+      await page.locator('button:has-text("Dashboard")').click();
+      await page.waitForTimeout(300);
       
-      // Navigate back
-      await page.click('text=Add Policy');
-      await page.waitForURL('/add-policy');
+      // Navigate back to Add Policy tab
+      await page.locator('button:has-text("Add Policy")').click();
+      await page.waitForTimeout(300);
       
       // Form should be reset (clean slate for new policy)
       // This is expected behavior

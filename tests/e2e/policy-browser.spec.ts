@@ -7,7 +7,14 @@ import { test, expect } from '@playwright/test';
 
 test.describe('Policy Browser', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/policies');
+    await page.goto('/');
+    
+    // Wait for page to load
+    await page.waitForTimeout(500);
+    
+    // Navigate to Policy Browser tab
+    await page.locator('button:has-text("Policy Browser")').click();
+    await page.waitForTimeout(300);
   });
 
   test('should display policy browser page', async ({ page }) => {
